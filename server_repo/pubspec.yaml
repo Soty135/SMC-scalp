@@ -1,0 +1,13 @@
+name: smc_scalp_server
+description: Server-side analysis engine + FCM relay for SMC Scalp
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  http: ^1.2.0
+  uuid: ^4.5.0
+  hive: ^2.2.3
+  googleapis_auth: ^1.6.0

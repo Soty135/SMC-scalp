@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: smc-scalp-server
+    env: docker
+    plan: free
+    envVars:
+      - key: FCM_PROJECT_ID
+        value: smc-scalp
+      - key: FCM_SERVICE_ACCOUNT_JSON
+        sync: false

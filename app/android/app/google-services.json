@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "21726403215",
+    "project_id": "smc-scalp",
+    "storage_bucket": "smc-scalp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:21726403215:android:2aa325593aaf756a34eefa",
+        "android_client_info": {
+          "package_name": "com.smcscalp.smc_scalp_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWP8M3tpW_8B-ZlvrtjS-WjWe9olpN8ew"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
