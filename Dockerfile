@@ -2,10 +2,10 @@ FROM dart:stable AS build
 
 WORKDIR /app
 
-COPY pubspec.yaml .
+COPY server/pubspec.yaml .
 RUN dart pub get
 
-COPY . .
+COPY server/ .
 RUN dart pub get --offline
 RUN dart compile exe main.dart -o /app/server
 
