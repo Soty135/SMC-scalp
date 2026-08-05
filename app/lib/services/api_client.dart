@@ -22,6 +22,15 @@ class ApiClient {
     for (int attempt = 0; attempt <= retries; attempt++) {
       try {
         return await action();
+      } on ApiException catch (e) {
+        if (attempt == retries) rethrow;
+        final isServerError = e.statusCode != null && e.statusCode! >= 500;
+        final delay = Duration(seconds: isServerError ? 5 * (attempt + 1) : 1 * (attempt + 1));
+        stdout.writeln(
+          '[${DateTime.now()}] $description HTTP ${e.statusCode} error: $e'
+          ' — retrying in ${delay.inSeconds}s (attempt ${attempt + 1}/$retries)',
+        );
+        await Future.delayed(delay);
       } on SocketException catch (e) {
         if (attempt == retries) rethrow;
         final delay = Duration(seconds: 2 * (attempt + 1));
@@ -61,7 +70,7 @@ class ApiClient {
       final response = await _client.get(url);
 
       if (response.statusCode != 200) {
-        throw ApiException('Failed to fetch OHLC data: ${response.statusCode}');
+        throw ApiException('Failed to fetch OHLC data: ${response.statusCode}', statusCode: response.statusCode);
       }
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -80,7 +89,7 @@ class ApiClient {
       final url = Uri.parse('$baseUrl/api/$symbol');
       final response = await _client.get(url);
       if (response.statusCode != 200) {
-        throw ApiException('Failed to fetch tick: ${response.statusCode}');
+        throw ApiException('Failed to fetch tick: ${response.statusCode}', statusCode: response.statusCode);
       }
       return Tick.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
     });
@@ -93,7 +102,7 @@ class ApiClient {
       });
       final response = await _client.get(url);
       if (response.statusCode != 200) {
-        throw ApiException('Failed to fetch ticks: ${response.statusCode}');
+        throw ApiException('Failed to fetch ticks: ${response.statusCode}', statusCode: response.statusCode);
       }
       final data = jsonDecode(response.body);
       if (data is List) {
@@ -121,7 +130,7 @@ class ApiClient {
       });
       final response = await _client.get(url);
       if (response.statusCode != 200) {
-        throw ApiException('Failed to fetch calendar: ${response.statusCode}');
+        throw ApiException('Failed to fetch calendar: ${response.statusCode}', statusCode: response.statusCode);
       }
       return (jsonDecode(response.body) as List<dynamic>).cast<Map<String, dynamic>>();
     });
@@ -132,7 +141,7 @@ class ApiClient {
       final url = Uri.parse('$baseUrl/api/active');
       final response = await _client.get(url);
       if (response.statusCode != 200) {
-        throw ApiException('Failed to fetch symbols: ${response.statusCode}');
+        throw ApiException('Failed to fetch symbols: ${response.statusCode}', statusCode: response.statusCode);
       }
       return (jsonDecode(response.body) as List<dynamic>).cast<Map<String, dynamic>>();
     });
@@ -143,7 +152,8 @@ class ApiClient {
 
 class ApiException implements Exception {
   final String message;
-  ApiException(this.message);
+  final int? statusCode;
+  ApiException(this.message, {this.statusCode});
   @override
   String toString() => 'ApiException: $message';
 }
