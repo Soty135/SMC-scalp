@@ -57,22 +57,11 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
+        onPressed: () {
           if (settings.isAnalysisRunning) {
             analysis.stopAnalysis();
           } else {
-            try {
-              await analysis.startAnalysis();
-            } catch (e) {
-              analysis.stopAnalysis();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Analysis failed: $e'),
-                  backgroundColor: Colors.redAccent,
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            }
+            analysis.startAnalysis();
           }
         },
         icon: Icon(settings.isAnalysisRunning ? Icons.stop : Icons.play_arrow),

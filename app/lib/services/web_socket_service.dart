@@ -88,7 +88,7 @@ class WebSocketService {
     null,
   ];
 
-  static const connectTimeout = Duration(seconds: 10);
+  static const connectTimeout = Duration(seconds: 5);
 
   Future<void> subscribe(List<String> symbols) async {
     _subscribed.addAll(symbols);

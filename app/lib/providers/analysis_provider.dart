@@ -78,15 +78,21 @@ class AnalysisProvider extends ChangeNotifier {
     if (_isRunning) return;
     _isRunning = true;
     _statusMessage = 'Analysis running…';
+    notifyListeners();
+
+    await Future.delayed(Duration.zero);
 
     _tickSub ??= _webSocket.tickStream.listen(_onTick);
     _stateSub ??= _webSocket.stateStream.listen(_onState);
     if (!_webSocket.isConnected) {
       try {
+        print('[${DateTime.now()}] startAnalysis: connecting WS...');
         await _webSocket.connect();
+        print('[${DateTime.now()}] startAnalysis: WS connected=${_webSocket.isConnected} state=${_webSocket.connectionState.name}');
       } catch (e) {
         _isRunning = false;
         _statusMessage = 'WS connection failed: $e — tap to retry';
+        print('[${DateTime.now()}] startAnalysis: WS connection failed: $e');
         notifyListeners();
         return;
       }
@@ -95,6 +101,7 @@ class AnalysisProvider extends ChangeNotifier {
       _isRunning = false;
       _statusMessage =
           'WS not connected (${_webSocket.connectionState.name}) — tap to retry';
+      print('[${DateTime.now()}] startAnalysis: WS not connected after connect attempt, state=${_webSocket.connectionState.name}');
       notifyListeners();
       return;
     }
