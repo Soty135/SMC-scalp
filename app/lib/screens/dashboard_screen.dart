@@ -5,6 +5,7 @@ import '../models/trade_signal.dart';
 import '../providers/analysis_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/signal_provider.dart';
+import '../services/web_socket_service.dart';
 import '../ui/ui_helpers.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -79,7 +80,12 @@ class DashboardScreen extends StatelessWidget {
     SettingsProvider settings,
   ) {
     final running = settings.isAnalysisRunning;
-    final ws = analysis.isConnected;
+    final wsState = analysis.connectionState;
+    final wsLabel = wsState == ConnectionState.connected
+        ? 'CONNECTED'
+        : wsState == ConnectionState.reconnecting
+            ? 'RECONNECTING'
+            : 'DISCONNECTED';
     return Card(
       margin: const EdgeInsets.all(12),
       child: Padding(
@@ -105,7 +111,7 @@ class DashboardScreen extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     running
-                        ? 'WS: ${ws ? 'CONNECTED' : 'RECONNECTING'} · '
+                        ?                         'WS: $wsLabel · '
                             '${settings.selectedPairs.length} pairs · every '
                             '30s'
                         : 'Idle — tap START ANALYSIS',

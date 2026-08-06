@@ -49,6 +49,10 @@ class ApiClient {
         await Future.delayed(delay);
       } catch (e) {
         if (attempt == retries) rethrow;
+        stdout.writeln(
+          '[${DateTime.now()}] $description unexpected error: $e'
+          ' — retrying in ${1 * (attempt + 1)}s (attempt ${attempt + 1}/$retries)',
+        );
         await Future.delayed(Duration(seconds: 1 * (attempt + 1)));
       }
     }

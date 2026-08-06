@@ -49,13 +49,14 @@ class AnalysisProvider extends ChangeNotifier {
   final Map<String, _PairState> _states = {};
 
   StreamSubscription<Tick>? _tickSub;
-  StreamSubscription<bool>? _connSub;
+  StreamSubscription<ConnectionState>? _stateSub;
   DateTime _lastTickNotify = DateTime.fromMillisecondsSinceEpoch(0);
 
   bool get isRunning => _isRunning;
   bool get isAnalyzing => _isAnalyzing;
   String get statusMessage => _statusMessage;
   bool get isConnected => _webSocket.isConnected;
+  ConnectionState get connectionState => _webSocket.connectionState;
   Map<String, double> get currentPrices => _currentPrices;
   Map<String, String> get pairStatuses => _pairStatuses;
 
@@ -79,7 +80,7 @@ class AnalysisProvider extends ChangeNotifier {
     _statusMessage = 'Analysis running…';
 
     _tickSub ??= _webSocket.tickStream.listen(_onTick);
-    _connSub ??= _webSocket.connectionStream.listen(_onConn);
+    _stateSub ??= _webSocket.stateStream.listen(_onState);
     if (!_webSocket.isConnected) {
       await _webSocket.connect();
     }
@@ -120,8 +121,8 @@ class AnalysisProvider extends ChangeNotifier {
     }
   }
 
-  void _onConn(bool connected) {
-    if (connected) {
+  void _onState(ConnectionState state) {
+    if (state == ConnectionState.connected) {
       _webSocket.subscribe(_settingsProvider.selectedPairs);
     }
     notifyListeners();
@@ -131,6 +132,11 @@ class AnalysisProvider extends ChangeNotifier {
 
   Future<void> _runAnalysis() async {
     if (_isAnalyzing) return;
+    if (!_webSocket.isConnected) {
+      _statusMessage = 'Waiting for connection…';
+      notifyListeners();
+      return;
+    }
     _isAnalyzing = true;
     notifyListeners();
 
@@ -546,7 +552,7 @@ class AnalysisProvider extends ChangeNotifier {
   void dispose() {
     _timer?.cancel();
     _tickSub?.cancel();
-    _connSub?.cancel();
+    _stateSub?.cancel();
     _settingsProvider.removeListener(_onSettingsChanged);
     super.dispose();
   }
