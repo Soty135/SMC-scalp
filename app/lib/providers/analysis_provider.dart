@@ -49,14 +49,14 @@ class AnalysisProvider extends ChangeNotifier {
   final Map<String, _PairState> _states = {};
 
   StreamSubscription<Tick>? _tickSub;
-  StreamSubscription<ConnectionState>? _stateSub;
+  StreamSubscription<WsConnectionState>? _stateSub;
   DateTime _lastTickNotify = DateTime.fromMillisecondsSinceEpoch(0);
 
   bool get isRunning => _isRunning;
   bool get isAnalyzing => _isAnalyzing;
   String get statusMessage => _statusMessage;
   bool get isConnected => _webSocket.isConnected;
-  ConnectionState get connectionState => _webSocket.connectionState;
+  WsConnectionState get connectionState => _webSocket.connectionState;
   Map<String, double> get currentPrices => _currentPrices;
   Map<String, String> get pairStatuses => _pairStatuses;
 
@@ -121,8 +121,8 @@ class AnalysisProvider extends ChangeNotifier {
     }
   }
 
-  void _onState(ConnectionState state) {
-    if (state == ConnectionState.connected) {
+  void _onState(WsConnectionState state) {
+    if (state == WsConnectionState.connected) {
       _webSocket.subscribe(_settingsProvider.selectedPairs);
     }
     notifyListeners();

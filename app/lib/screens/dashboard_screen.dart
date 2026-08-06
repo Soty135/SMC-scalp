@@ -81,9 +81,9 @@ class DashboardScreen extends StatelessWidget {
   ) {
     final running = settings.isAnalysisRunning;
     final wsState = analysis.connectionState;
-    final wsLabel = wsState == ConnectionState.connected
+    final wsLabel = wsState == WsConnectionState.connected
         ? 'CONNECTED'
-        : wsState == ConnectionState.reconnecting
+        : wsState == WsConnectionState.reconnecting
             ? 'RECONNECTING'
             : 'DISCONNECTED';
     return Card(

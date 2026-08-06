@@ -2,24 +2,24 @@ import 'dart:async';
 import 'package:signalr_core/signalr_core.dart';
 import '../models/tick.dart';
 
-enum ConnectionState { connected, reconnecting, disconnected }
+enum WsConnectionState { connected, reconnecting, disconnected }
 
 class WebSocketService {
   HubConnection? _connection;
   final _tickController = StreamController<Tick>.broadcast();
   final _connectionController = StreamController<bool>.broadcast();
-  final _stateController = StreamController<ConnectionState>.broadcast();
-  ConnectionState _state = ConnectionState.disconnected;
+  final _stateController = StreamController<WsConnectionState>.broadcast();
+  WsConnectionState _state = WsConnectionState.disconnected;
   final Set<String> _subscribed = {};
 
   Stream<Tick> get tickStream => _tickController.stream;
   Stream<bool> get connectionStream => _connectionController.stream;
-  Stream<ConnectionState> get stateStream => _stateController.stream;
-  ConnectionState get connectionState => _state;
-  bool get isConnected => _state == ConnectionState.connected;
+  Stream<WsConnectionState> get stateStream => _stateController.stream;
+  WsConnectionState get connectionState => _state;
+  bool get isConnected => _state == WsConnectionState.connected;
 
   Future<void> connect() async {
-    if (_state == ConnectionState.connected) return;
+    if (_state == WsConnectionState.connected) return;
 
     _connection = HubConnectionBuilder()
         .withUrl('https://biquote.io/hubs/tick')
@@ -35,13 +35,13 @@ class WebSocketService {
     });
 
     _connection!.onreconnecting((Exception? exception) {
-      _state = ConnectionState.reconnecting;
+      _state = WsConnectionState.reconnecting;
       _stateController.add(_state);
       _connectionController.add(false);
     });
 
     _connection!.onreconnected((_) {
-      _state = ConnectionState.connected;
+      _state = WsConnectionState.connected;
       _stateController.add(_state);
       _connectionController.add(true);
       if (_subscribed.isNotEmpty) {
@@ -50,13 +50,13 @@ class WebSocketService {
     });
 
     _connection!.onclose((Exception? exception) {
-      _state = ConnectionState.disconnected;
+      _state = WsConnectionState.disconnected;
       _stateController.add(_state);
       _connectionController.add(false);
     });
 
     await _connection!.start();
-    _state = ConnectionState.connected;
+    _state = WsConnectionState.connected;
     _stateController.add(_state);
     _connectionController.add(true);
   }
@@ -73,21 +73,21 @@ class WebSocketService {
 
   Future<void> subscribe(List<String> symbols) async {
     _subscribed.addAll(symbols);
-    if (_connection != null && _state == ConnectionState.connected) {
+    if (_connection != null && _state == WsConnectionState.connected) {
       await _connection!.invoke('Subscribe', args: [symbols]);
     }
   }
 
   Future<void> unsubscribe(List<String> symbols) async {
     _subscribed.removeAll(symbols);
-    if (_connection != null && _state == ConnectionState.connected) {
+    if (_connection != null && _state == WsConnectionState.connected) {
       await _connection!.invoke('Unsubscribe', args: [symbols]);
     }
   }
 
   Future<void> disconnect() async {
     await _connection?.stop();
-    _state = ConnectionState.disconnected;
+    _state = WsConnectionState.disconnected;
     _stateController.add(_state);
     _connectionController.add(false);
   }
