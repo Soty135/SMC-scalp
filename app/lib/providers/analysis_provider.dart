@@ -141,6 +141,17 @@ class AnalysisProvider extends ChangeNotifier {
   void _onState(WsConnectionState state) {
     if (state == WsConnectionState.connected) {
       _webSocket.subscribe(_settingsProvider.selectedPairs);
+      if (_isRunning && _statusMessage.contains('waiting')) {
+        _statusMessage = 'Analysis running…';
+      }
+    } else if (state == WsConnectionState.reconnecting) {
+      if (_isRunning) {
+        _statusMessage = 'WS reconnecting…';
+      }
+    } else if (state == WsConnectionState.disconnected) {
+      if (_isRunning) {
+        _statusMessage = 'WS disconnected — tap to retry';
+      }
     }
     notifyListeners();
   }

@@ -65,6 +65,13 @@ class DashboardScreen extends StatelessWidget {
               await analysis.startAnalysis();
             } catch (e) {
               analysis.stopAnalysis();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Analysis failed: $e'),
+                  backgroundColor: Colors.redAccent,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
             }
           }
         },
