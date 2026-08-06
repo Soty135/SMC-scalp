@@ -57,11 +57,15 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
+        onPressed: () async {
           if (settings.isAnalysisRunning) {
             analysis.stopAnalysis();
           } else {
-            analysis.startAnalysis();
+            try {
+              await analysis.startAnalysis();
+            } catch (e) {
+              analysis.stopAnalysis();
+            }
           }
         },
         icon: Icon(settings.isAnalysisRunning ? Icons.stop : Icons.play_arrow),

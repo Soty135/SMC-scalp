@@ -82,9 +82,18 @@ class AnalysisProvider extends ChangeNotifier {
     _tickSub ??= _webSocket.tickStream.listen(_onTick);
     _stateSub ??= _webSocket.stateStream.listen(_onState);
     if (!_webSocket.isConnected) {
-      await _webSocket.connect();
+      try {
+        await _webSocket.connect();
+      } catch (e) {
+        _isRunning = false;
+        _statusMessage = 'WS connection failed: $e — tap to retry';
+        notifyListeners();
+        return;
+      }
     }
-    await _webSocket.subscribe(_settingsProvider.selectedPairs);
+    try {
+      await _webSocket.subscribe(_settingsProvider.selectedPairs);
+    } catch (_) {}
     await _news.start();
     await _settingsProvider.setAnalysisRunning(true);
 

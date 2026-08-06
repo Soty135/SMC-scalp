@@ -55,7 +55,19 @@ class WebSocketService {
       _connectionController.add(false);
     });
 
-    await _connection!.start();
+    try {
+      await _connection!.start().timeout(connectTimeout);
+    } on TimeoutException {
+      _state = WsConnectionState.disconnected;
+      _stateController.add(_state);
+      _connectionController.add(false);
+      throw Exception('WS connection timed out after ${connectTimeout.inSeconds}s');
+    } catch (e) {
+      _state = WsConnectionState.disconnected;
+      _stateController.add(_state);
+      _connectionController.add(false);
+      rethrow;
+    }
     _state = WsConnectionState.connected;
     _stateController.add(_state);
     _connectionController.add(true);
@@ -70,6 +82,8 @@ class WebSocketService {
     30000,
     null,
   ];
+
+  static const connectTimeout = Duration(seconds: 10);
 
   Future<void> subscribe(List<String> symbols) async {
     _subscribed.addAll(symbols);
