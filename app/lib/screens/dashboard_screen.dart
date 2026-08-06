@@ -128,7 +128,6 @@ class DashboardScreen extends StatelessWidget {
                       color: Color(0xFF8A97A5),
                     ),
                   ),
-                  ),
                 ],
               ),
             ),

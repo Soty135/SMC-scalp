@@ -61,7 +61,7 @@ class WebSocketService {
     });
 
     try {
-      await _connection!.start().timeout(connectTimeout);
+      await _connection!.start()?.timeout(connectTimeout);
     } on TimeoutException {
       _state = WsConnectionState.disconnected;
       _stateController.add(_state);
