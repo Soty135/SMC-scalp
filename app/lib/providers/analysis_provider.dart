@@ -91,6 +91,13 @@ class AnalysisProvider extends ChangeNotifier {
         return;
       }
     }
+    if (!_webSocket.isConnected) {
+      _isRunning = false;
+      _statusMessage =
+          'WS not connected (${_webSocket.connectionState.name}) — tap to retry';
+      notifyListeners();
+      return;
+    }
     try {
       await _webSocket.subscribe(_settingsProvider.selectedPairs);
     } catch (_) {}
@@ -110,6 +117,7 @@ class AnalysisProvider extends ChangeNotifier {
     _timer?.cancel();
     _statusMessage = 'Stopped';
     _news.stop();
+    await _webSocket.disconnect();
     await _settingsProvider.setAnalysisRunning(false);
     notifyListeners();
   }
@@ -142,7 +150,8 @@ class AnalysisProvider extends ChangeNotifier {
   Future<void> _runAnalysis() async {
     if (_isAnalyzing) return;
     if (!_webSocket.isConnected) {
-      _statusMessage = 'Waiting for connection…';
+      _statusMessage =
+          'WS ${_webSocket.connectionState.name} — waiting for connection…';
       notifyListeners();
       return;
     }

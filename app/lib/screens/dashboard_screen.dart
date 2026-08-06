@@ -115,7 +115,7 @@ class DashboardScreen extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     running
-                        ?                         'WS: $wsLabel · '
+                        ? 'WS: $wsLabel · '
                             '${settings.selectedPairs.length} pairs · every '
                             '30s'
                         : 'Idle — tap START ANALYSIS',
@@ -123,6 +123,15 @@ class DashboardScreen extends StatelessWidget {
                       fontSize: 10,
                       color: Color(0xFF8A97A5),
                     ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Connection: $wsLabel',
+                    style: const TextStyle(
+                      fontSize: 9,
+                      color: Color(0xFF8A97A5),
+                    ),
+                  ),
                   ),
                 ],
               ),
