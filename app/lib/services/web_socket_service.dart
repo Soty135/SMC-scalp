@@ -28,7 +28,7 @@ class WebSocketService {
 
     _connection = HubConnectionBuilder()
         .withUrl('https://biquote.io/hubs/tick')
-        .withAutomaticReconnect(_reconnectPolicy)
+        .withAutomaticReconnect(DefaultReconnectPolicy(retryDelays: _reconnectPolicy))
         .build();
 
     _connection!.on('ReceiveTick', (List<dynamic>? args) {
