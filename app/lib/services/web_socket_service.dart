@@ -19,7 +19,7 @@ class WebSocketService {
   bool get isConnected => _state == WsConnectionState.connected;
 
   Future<void> connect() async {
-    if (_state == WsConnectionState.connected) return;
+    if (_state == WsConnectionState.connected || _state == WsConnectionState.reconnecting) return;
 
     _connection = HubConnectionBuilder()
         .withUrl('https://biquote.io/hubs/tick')
